@@ -42,4 +42,11 @@ server.delete("/delete-news/:id", async(request, reply) => {
   return reply.status(204).send();
 });
 
-server.listen({ port: 1992 });
+const port = process.env.PORT || 1992;
+server.listen({ port, host: "0.0.0.0" }, (err, address) => {
+  if (err) {
+    server.log.error(err);
+    process.exit(1);
+  }
+  console.log(`🚀 Server rodando em: ${address}`);
+});
