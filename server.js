@@ -19,10 +19,19 @@ server.post("/news", async (request, reply) => {
   return reply.status(201).send({ message: "Notícia criada" });
 });
 
-server.get("/show-news", async (request) => {
-  const { title } = request.query;
+server.get("/show-news", async (request, reply) => {
+  try {
+    const title = request.query.title || null; // fallback caso não passe query
+    const newsList = await dataBase.List(title);
 
-  return await dataBase.List(title);
+    if (!Array.isArray(newsList)) {
+      return reply.status(500).send({ error: "Formato de dados inválido" });
+    }
+
+    return newsList;
+  } catch (err) {
+    reply.status(500).send({ error: "Erro ao listar notícias" });
+  }
 });
 
 server.put("/update-news/:id", async (request, reply) => {

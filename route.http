@@ -10,7 +10,7 @@ Content-Type: application/json
 
 ###
 
-GET http://localhost:1992/show-news
+GET http://apijornal.onrender.com/show-news
 
 ###
 
