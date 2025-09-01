@@ -1,26 +1,19 @@
 import fastify from "fastify";
 import cors from "@fastify/cors";
 import multipart from "@fastify/multipart";
-import staticPlugin from "@fastify/static";
+import { createClient } from "@supabase/supabase-js";
 import path from "path";
-import fs from "fs";
-import { pipeline } from "stream";
-import { promisify } from "util";
 import { DataBasePostgres } from "./database-Postgres.js";
 
-const pump = promisify(pipeline);
+// Configurar Supabase
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_KEY
+);
+
+// Fastify
 const server = fastify({ logger: true });
 const dataBase = new DataBasePostgres();
-
-import { fileURLToPath } from "url";
-
-// Configurar __dirname para ES Modules
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Diretório para uploads
-const uploadDir = path.join(__dirname, "uploads");
-if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir);
 
 // Plugins
 await server.register(cors, {
@@ -32,18 +25,13 @@ await server.register(cors, {
 await server.register(multipart, {
   limits: {
     fileSize: 10 * 1024 * 1024, // 10 MB por arquivo
-    files: 5,                    // máximo 5 arquivos
-    fieldNameSize: 200,          // tamanho máximo do nome do campo
-    fields: 10                   // máximo de campos de texto
-  }
+    files: 5,
+    fieldNameSize: 200,
+    fields: 10,
+  },
 });
 
-server.register(staticPlugin, {
-  root: uploadDir,
-  prefix: "/uploads/",
-});
-
-// POST /news com até 5 imagens
+// POST /news com upload para Supabase
 server.post("/news", async (request, reply) => {
   const parts = request.parts();
   const newsData = {
@@ -62,19 +50,38 @@ server.post("/news", async (request, reply) => {
 
   for await (const part of parts) {
     if (part.file) {
-      // nome do arquivo seguro
-      const originalName = part.filename || (part.file.hapi && part.file.hapi.filename) || `file-${Date.now()}`;
-      const filename = Date.now() + "-" + originalName;
-      const filepath = path.join(uploadDir, filename);
+      // Gera nome único
+      const ext = path.extname(part.filename || "jpg");
+      const filename = `${Date.now()}-${Math.random()
+        .toString(36)
+        .substring(2, 8)}${ext}`;
 
-      await new Promise((resolve, reject) => {
-        const writeStream = fs.createWriteStream(filepath);
-        part.file.pipe(writeStream);
-        part.file.on("end", resolve);
-        part.file.on("error", reject);
-      });
+      // Converte para Buffer
+      const chunks = [];
+      for await (const chunk of part.file) {
+        chunks.push(chunk);
+      }
+      const buffer = Buffer.concat(chunks);
 
-      newsData[`image${indexImage}`] = `/uploads/${filename}`;
+      // Faz upload no Supabase
+      const { data, error } = await supabase.storage
+        .from("news-images") // <-- bucket criado no Supabase
+        .upload(filename, buffer, {
+          contentType: part.mimetype,
+          upsert: true,
+        });
+
+      if (error) {
+        console.error("Erro Supabase:", error);
+        return reply.status(500).send({ error: "Erro ao salvar imagem" });
+      }
+
+      // Gera URL pública
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from("news-images").getPublicUrl(filename);
+
+      newsData[`image${indexImage}`] = publicUrl;
       indexImage++;
     } else if (part.fieldname && part.value) {
       newsData[part.fieldname] = part.value;
