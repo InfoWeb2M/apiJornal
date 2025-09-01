@@ -5,10 +5,10 @@ import { createClient } from "@supabase/supabase-js";
 import path from "path";
 import { DataBasePostgres } from "./database-Postgres.js";
 
-// Configurar Supabase
+// Supabase
 const supabase = createClient(
   process.env.SUPABASE_URL,
-  process.env.SUPABASE_KEY
+  process.env.SUPABASE_KEY_SERVICE // Usar service_role para uploads
 );
 
 // Fastify
@@ -51,20 +51,18 @@ server.post("/news", async (request, reply) => {
 
     for await (const part of parts) {
       if (part.file) {
-        // Gera nome único para cada arquivo
         const ext = path.extname(part.filename || ".jpg");
         const filename = `${Date.now()}-${Math.random()
           .toString(36)
           .substring(2, 8)}${ext}`;
 
-        // Converte para Buffer
         const chunks = [];
         for await (const chunk of part.file) {
           chunks.push(chunk);
         }
         const buffer = Buffer.concat(chunks);
 
-        // Faz upload no Supabase
+        // Upload no Supabase
         const { data: uploadData, error: uploadError } = await supabase.storage
           .from("news-images")
           .upload(filename, buffer, {
@@ -77,7 +75,7 @@ server.post("/news", async (request, reply) => {
           return reply.status(500).send({ error: "Erro ao salvar imagem" });
         }
 
-        // Gera URL pública
+        // URL pública
         const { data: publicData, error: publicError } = supabase.storage
           .from("news-images")
           .getPublicUrl(filename);
