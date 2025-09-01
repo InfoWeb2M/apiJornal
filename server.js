@@ -64,7 +64,7 @@ server.post("/news", async (request, reply) => {
 
         // Upload no Supabase
         const { data: uploadData, error: uploadError } = await supabase.storage
-          .from("news-images")
+          .from("imagens-noticias")
           .upload(filename, buffer, {
             contentType: part.mimetype,
             upsert: true,
@@ -77,7 +77,7 @@ server.post("/news", async (request, reply) => {
 
         // URL pública
         const { data: publicData, error: publicError } = supabase.storage
-          .from("news-images")
+          .from("imagens-noticias")
           .getPublicUrl(filename);
 
         if (publicError) {
