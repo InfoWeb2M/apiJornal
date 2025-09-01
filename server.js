@@ -28,7 +28,14 @@ await server.register(cors, {
   allowedHeaders: ["Content-Type", "Authorization"],
 });
 
-await server.register(multipart);
+await server.register(multipart, {
+  limits: {
+    fileSize: 10 * 1024 * 1024, // 10 MB por arquivo
+    files: 5,                    // máximo 5 arquivos
+    fieldNameSize: 200,          // tamanho máximo do nome do campo
+    fields: 10                   // máximo de campos de texto
+  }
+});
 
 server.register(staticPlugin, {
   root: uploadDir,
