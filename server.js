@@ -12,8 +12,9 @@ const pump = promisify(pipeline);
 const server = fastify({ logger: true });
 const dataBase = new DataBasePostgres();
 
-// Configurar __dirname para ES Modules
 import { fileURLToPath } from "url";
+
+// Configurar __dirname para ES Modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -61,19 +62,25 @@ server.post("/news", async (request, reply) => {
 
   for await (const part of parts) {
     if (part.file) {
-      // é um arquivo
-      const filename = Date.now() + "-" + part.filename;
+      // nome do arquivo seguro
+      const originalName = part.filename || (part.file.hapi && part.file.hapi.filename) || `file-${Date.now()}`;
+      const filename = Date.now() + "-" + originalName;
       const filepath = path.join(uploadDir, filename);
-      await part.toFile(filepath);
+
+      await new Promise((resolve, reject) => {
+        const writeStream = fs.createWriteStream(filepath);
+        part.file.pipe(writeStream);
+        part.file.on("end", resolve);
+        part.file.on("error", reject);
+      });
+
       newsData[`image${indexImage}`] = `/uploads/${filename}`;
       indexImage++;
     } else if (part.fieldname && part.value) {
-      // é um campo de texto
       newsData[part.fieldname] = part.value;
     }
   }
 
-  // Salvar no banco
   await dataBase.Create(newsData);
 
   return reply.status(201).send({ message: "Notícia criada", data: newsData });
