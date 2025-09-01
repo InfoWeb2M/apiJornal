@@ -44,40 +44,39 @@ server.register(staticPlugin, {
 
 // POST /news com até 5 imagens
 server.post("/news", async (request, reply) => {
-  const imageUrls = [];
+  const parts = request.parts();
+  const newsData = {
+    title: "",
+    summary: "",
+    author: "",
+    body: "",
+    image1: null,
+    image2: null,
+    image3: null,
+    image4: null,
+    image5: null,
+  };
 
-  if (request.isMultipart()) {
-    let count = 0;
-    for await (const part of request.files()) {
-      if (count >= 5) break;
+  let indexImage = 1;
 
+  for await (const part of parts) {
+    if (part.file) {
+      // é um arquivo
       const filename = Date.now() + "-" + part.filename;
       const filepath = path.join(uploadDir, filename);
-
-      await pump(part.file, fs.createWriteStream(filepath));
-
-      imageUrls.push(`/uploads/${filename}`);
-      count++;
+      await part.toFile(filepath);
+      newsData[`image${indexImage}`] = `/uploads/${filename}`;
+      indexImage++;
+    } else if (part.fieldname && part.value) {
+      // é um campo de texto
+      newsData[part.fieldname] = part.value;
     }
   }
 
-  const { title, body, summary, author } = request.body;
-
-  const newsData = {
-    title,
-    body,
-    summary,
-    author,
-    image1: imageUrls[0] || null,
-    image2: imageUrls[1] || null,
-    image3: imageUrls[2] || null,
-    image4: imageUrls[3] || null,
-    image5: imageUrls[4] || null,
-  };
-
+  // Salvar no banco
   await dataBase.Create(newsData);
 
-  return reply.status(201).send({ message: "Notícia criada", imageUrls });
+  return reply.status(201).send({ message: "Notícia criada", data: newsData });
 });
 
 // GET /show-news
