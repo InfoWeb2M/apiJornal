@@ -5,11 +5,15 @@ import staticPlugin from "@fastify/static";
 import path from "path";
 import fs from "fs";
 import { DataBasePostgres } from "./database-Postgres.js";
+import { fileURLToPath } from "url";
 
 const server = fastify({ logger: true });
 const dataBase = new DataBasePostgres();
 
 // Diretório para uploads
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const uploadDir = path.join(__dirname, "uploads");
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir);
 
