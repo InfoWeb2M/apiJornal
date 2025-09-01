@@ -33,64 +33,75 @@ await server.register(multipart, {
 
 // POST /news com upload para Supabase
 server.post("/news", async (request, reply) => {
-  const parts = request.parts();
-  const newsData = {
-    title: "",
-    summary: "",
-    author: "",
-    body: "",
-    image1: null,
-    image2: null,
-    image3: null,
-    image4: null,
-    image5: null,
-  };
+  try {
+    const parts = request.parts();
+    const newsData = {
+      title: "",
+      summary: "",
+      author: "",
+      body: "",
+      image1: null,
+      image2: null,
+      image3: null,
+      image4: null,
+      image5: null,
+    };
 
-  let indexImage = 1;
+    let indexImage = 1;
 
-  for await (const part of parts) {
-    if (part.file) {
-      // Gera nome único
-      const ext = path.extname(part.filename || "jpg");
-      const filename = `${Date.now()}-${Math.random()
-        .toString(36)
-        .substring(2, 8)}${ext}`;
+    for await (const part of parts) {
+      if (part.file) {
+        // Gera nome único para cada arquivo
+        const ext = path.extname(part.filename || ".jpg");
+        const filename = `${Date.now()}-${Math.random()
+          .toString(36)
+          .substring(2, 8)}${ext}`;
 
-      // Converte para Buffer
-      const chunks = [];
-      for await (const chunk of part.file) {
-        chunks.push(chunk);
+        // Converte para Buffer
+        const chunks = [];
+        for await (const chunk of part.file) {
+          chunks.push(chunk);
+        }
+        const buffer = Buffer.concat(chunks);
+
+        // Faz upload no Supabase
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from("news-images")
+          .upload(filename, buffer, {
+            contentType: part.mimetype,
+            upsert: true,
+          });
+
+        if (uploadError) {
+          console.error("Erro ao salvar imagem:", uploadError);
+          return reply.status(500).send({ error: "Erro ao salvar imagem" });
+        }
+
+        // Gera URL pública
+        const { data: publicData, error: publicError } = supabase.storage
+          .from("news-images")
+          .getPublicUrl(filename);
+
+        if (publicError) {
+          console.error("Erro ao gerar URL pública:", publicError);
+          return reply.status(500).send({ error: "Erro ao gerar URL pública" });
+        }
+
+        newsData[`image${indexImage}`] = publicData.publicUrl;
+        indexImage++;
+      } else if (part.fieldname && part.value) {
+        newsData[part.fieldname] = part.value;
       }
-      const buffer = Buffer.concat(chunks);
-
-      // Faz upload no Supabase
-      const { data, error } = await supabase.storage
-        .from("news-images") // <-- bucket criado no Supabase
-        .upload(filename, buffer, {
-          contentType: part.mimetype,
-          upsert: true,
-        });
-
-      if (error) {
-        console.error("Erro Supabase:", error);
-        return reply.status(500).send({ error: "Erro ao salvar imagem" });
-      }
-
-      // Gera URL pública
-      const {
-        data: { publicUrl },
-      } = supabase.storage.from("news-images").getPublicUrl(filename);
-
-      newsData[`image${indexImage}`] = publicUrl;
-      indexImage++;
-    } else if (part.fieldname && part.value) {
-      newsData[part.fieldname] = part.value;
     }
+
+    // Salva no banco
+    await dataBase.Create(newsData);
+
+    return reply.status(201).send({ message: "Notícia criada", data: newsData });
+  } catch (err) {
+    console.error("Erro no endpoint /news:", err);
+    return reply.status(500).send({ error: "Erro interno no servidor" });
   }
-
-  await dataBase.Create(newsData);
-
-  return reply.status(201).send({ message: "Notícia criada", data: newsData });
 });
 
 // GET /show-news
