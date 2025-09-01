@@ -95,9 +95,7 @@ server.post("/news", async (request, reply) => {
     // Salva no banco
     await dataBase.Create(newsData);
 
-    return reply
-      .status(201)
-      .send({ message: "Notícia criada", data: newsData });
+    return reply.status(201).send({ message: "Notícia criada", data: newsData });
   } catch (err) {
     console.error("Erro no endpoint /news:", err);
     return reply.status(500).send({ error: "Erro interno no servidor" });
@@ -132,51 +130,11 @@ server.put("/update-news/:id", async (request, reply) => {
 
 // DELETE /delete-news/:id
 server.delete("/delete-news/:id", async (request, reply) => {
-  try {
-    const { id } = request.params;
+  const { id } = request.params;
 
-    // 1️⃣ Buscar a notícia no banco
-    const news = await dataBase.GetById(id); // supondo que você tenha esse método
-    if (!news) {
-      return reply.status(404).send({ error: "Notícia não encontrada" });
-    }
+  await dataBase.Delete(id);
 
-    // 2️⃣ Deletar imagens no Supabase
-    const images = [
-      news.image1,
-      news.image2,
-      news.image3,
-      news.image4,
-      news.image5,
-    ].filter(Boolean); // remove null/undefined
-
-    for (const imageUrl of images) {
-      // Extrair o caminho relativo do bucket a partir da URL pública
-      const url = new URL(imageUrl);
-      const pathParts = url.pathname.split("/");
-      // /storage/v1/object/public/news-images/nome-do-arquivo
-      const filePath = pathParts.slice(5).join("/"); // pega apenas "nome-do-arquivo"
-
-      if (filePath) {
-        const { error } = await supabase.storage
-          .from("news-images")
-          .remove([filePath]);
-
-        if (error) {
-          console.error("Erro ao deletar imagem:", error);
-          // você pode optar por continuar mesmo assim ou abortar
-        }
-      }
-    }
-
-    // 3️⃣ Deletar notícia do banco
-    await dataBase.Delete(id);
-
-    return reply.status(204).send();
-  } catch (err) {
-    console.error("Erro ao deletar notícia:", err);
-    return reply.status(500).send({ error: "Erro interno no servidor" });
-  }
+  return reply.status(204).send();
 });
 
 // Start server
