@@ -31,8 +31,7 @@ export class DataBasePostgres {
   async Update(id, news) {
     return await sql`
       UPDATE noticias
-      SET title = ${news.title},
-          body = ${news.body},
+      SET body = ${news.body},
           summary = ${news.summary},
           author = ${news.author}
       WHERE id = ${id}

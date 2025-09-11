@@ -121,9 +121,9 @@ server.get("/show-news", async (request, reply) => {
 // PUT /update-news/:id
 server.put("/update-news/:id", async (request, reply) => {
   const { id } = request.params;
-  const { title, body, summary, author } = request.body;
+  const { body, summary, author } = request.body;
 
-  await dataBase.Update(id, { title, body, summary, author });
+  await dataBase.Update(id, { body, summary, author });
 
   return reply.status(200).send({ message: "Notícia atualizada" });
 });
