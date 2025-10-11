@@ -1,4 +1,4 @@
-POST http://localhost:1992/news
+POST http://apijornal.onrender.com/news
 Content-Type: multipart/form-data; boundary=WebKitFormBoundary
 
 --WebKitFormBoundary
@@ -22,6 +22,9 @@ Content-Disposition: form-data; name="newsType"
 
 cronica
 --WebKitFormBoundary--
+
+###
+
 GET http://apijornal.onrender.com/show-news
 
 ###

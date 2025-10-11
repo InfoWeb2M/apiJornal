@@ -5,13 +5,13 @@ export class DataBasePostgres {
   async List(search) {
     if (search) {
       return await sql`
-        SELECT id, title, body, summary, author, image1, image2, image3, image4, image5, created_at
+        SELECT id, title, body, summary, author, image1, image2, image3, image4, image5, created_at, newstype
         FROM noticias
         WHERE title ILIKE ${'%' + search + '%'}
       `;
     } else {
       return await sql`
-        SELECT id, title, body, summary, author, image1, image2, image3, image4, image5, created_at
+        SELECT id, title, body, summary, author, image1, image2, image3, image4, image5, created_at, newstype
         FROM noticias
       `;
     }
