@@ -21,10 +21,10 @@ export class DataBasePostgres {
     const newUUID = randomUUID();
     await sql`
       INSERT INTO noticias
-      (id, title, body, summary, author, image1, image2, image3, image4, image5)
+      (id, title, body, summary, author, image1, image2, image3, image4, image5, newstype)
       VALUES
       (${newUUID}, ${news.title}, ${news.body}, ${news.summary}, ${news.author},
-       ${news.image1}, ${news.image2}, ${news.image3}, ${news.image4}, ${news.image5})
+       ${news.image1}, ${news.image2}, ${news.image3}, ${news.image4}, ${news.image5}, ${news.newsType})
     `;
   }
 
@@ -33,7 +33,8 @@ export class DataBasePostgres {
       UPDATE noticias
       SET body = ${news.body},
           summary = ${news.summary},
-          author = ${news.author}
+          author = ${news.author},
+          newstype= ${news.newstype}
       WHERE id = ${id}
     `;
   }

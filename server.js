@@ -45,6 +45,7 @@ server.post("/news", async (request, reply) => {
       image3: null,
       image4: null,
       image5: null,
+      newsType:"",
     };
 
     let indexImage = 1;
@@ -121,9 +122,9 @@ server.get("/show-news", async (request, reply) => {
 // PUT /update-news/:id
 server.put("/update-news/:id", async (request, reply) => {
   const { id } = request.params;
-  const { body, summary, author } = request.body;
+  const { body, summary, author, newstype } = request.body;
 
-  await dataBase.Update(id, { body, summary, author });
+  await dataBase.Update(id, { body, summary, author, newstype });
 
   return reply.status(200).send({ message: "Notícia atualizada" });
 });
