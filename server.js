@@ -8,9 +8,13 @@ const server = fastify({ logger: true });
 
 // Middlewares nativos
 await server.register(cors, {
-  origin: "*",
+  origin: [
+    "https://jornalteresa.netlify.app",
+    "https://paineljornal.vercel.app"
+  ],
   methods: ["GET", "PUT", "POST", "DELETE", "OPTIONS"],
 });
+
 await server.register(multipart);
 
 // 🔹 Captura o início de cada request (para medir tempo de resposta)
