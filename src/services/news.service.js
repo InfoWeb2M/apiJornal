@@ -7,8 +7,15 @@ const model = new NewsModel();
 export class NewsService {
   async createNews(parts) {
     const newsData = {
-      title: "", summary: "", author: "", body: "",
-      image1: null, image2: null, image3: null, image4: null, image5: null,
+      title: "",
+      summary: "",
+      author: "",
+      body: "",
+      image1: null,
+      image2: null,
+      image3: null,
+      image4: null,
+      image5: null,
       newsType: "",
     };
 
@@ -16,7 +23,9 @@ export class NewsService {
     for await (const part of parts) {
       if (part.file) {
         const ext = path.extname(part.filename || ".jpg");
-        const filename = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}${ext}`;
+        const filename = `${Date.now()}-${Math.random()
+          .toString(36)
+          .substring(2, 8)}${ext}`;
 
         const chunks = [];
         for await (const chunk of part.file) chunks.push(chunk);
@@ -24,7 +33,10 @@ export class NewsService {
 
         const { error: uploadError } = await supabase.storage
           .from("imagens-noticias")
-          .upload(filename, buffer, { contentType: part.mimetype, upsert: true });
+          .upload(filename, buffer, {
+            contentType: part.mimetype,
+            upsert: true,
+          });
 
         if (uploadError) throw new Error("Erro ao salvar imagem");
 
@@ -52,6 +64,20 @@ export class NewsService {
   }
 
   async deleteNews(id) {
-    await model.delete(id);
+    try {
+      // Tenta buscar a notícia antes
+      const news = await model.getById(id);
+      if (!news) {
+        throw new Error("Notícia não encontrada");
+      }
+
+      // Deleta a notícia
+      await model.delete(id);
+
+      return news; // retorna o objeto deletado pro controller
+    } catch (err) {
+      console.error("🔥 ERRO NO SERVICE DELETE:", err);
+      throw new Error(err.message || "Erro ao deletar notícia");
+    }
   }
 }
