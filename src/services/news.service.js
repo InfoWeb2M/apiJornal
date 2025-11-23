@@ -63,7 +63,7 @@ export class NewsService {
     await model.update(id, data);
   }
 
-  static async deleteNews(id) {
+  async deleteNews(id) {
     try {
       // Tenta buscar a notícia antes
       const news = await model.getById(id);
