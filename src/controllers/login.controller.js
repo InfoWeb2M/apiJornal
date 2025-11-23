@@ -19,7 +19,16 @@ class LoginController {
         });
       }
 
-      return reply.status(200).send({ token });
+      return reply
+        .setCookie("token", token, {
+          httpOnly: true,
+          secure: true, // obrigatório em produção (HTTPS)
+          sameSite: "strict",
+          path: "/",
+          maxAge: 60 * 60 * 24, // 1 dia
+        })
+        .status(200)
+        .send({ message: "Login realizado" });
     } catch (err) {
       console.error("Erro no login:", err);
       return reply.status(500).send({

@@ -1,6 +1,7 @@
 import "dotenv/config"
 import fastify from "fastify";
 import cors from "@fastify/cors";
+import cookie from "@fastify/cookie";
 import fastifyJwt from "@fastify/jwt";
 import multipart from "@fastify/multipart";
 import { newsRoutes } from "./src/routes/news.routes.js";
@@ -16,6 +17,11 @@ await server.register(cors, {
     "https://paineljornal.vercel.app"
   ],
   methods: ["GET", "PUT", "POST", "DELETE", "OPTIONS"],
+});
+
+server.register(cookie, {
+  secret: process.env.COOKIE_SECRET, // usado para assinaturas
+  hook: "onRequest"
 });
 
 await server.register(multipart);
