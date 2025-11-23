@@ -23,8 +23,7 @@ await server.register(cors, {
 
 
 server.register(cookie, {
-  secret: process.env.COOKIE_SECRET, // usado para assinaturas
-  hook: "onRequest"
+  secret: process.env.JWT_SECRET, // usado para assinaturas
 });
 
 await server.register(multipart);
