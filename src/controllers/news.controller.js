@@ -1,6 +1,10 @@
 import { NewsService } from "../services/news.service.js";
 
 export class NewsController {
+  constructor() {
+    this.newsService = new NewsService(); // <--- inicializando
+  }
+
   async create(req, reply) {
     try {
       const parts = req.parts();
@@ -34,7 +38,7 @@ export class NewsController {
   async delete(req, reply) {
     try {
       const id = req.params.id;
-      const deletedNews = await NewsService.deleteNews(id);
+      const deletedNews = await this.newsService.deleteNews(id);
 
       return reply.send({
         success: true,
