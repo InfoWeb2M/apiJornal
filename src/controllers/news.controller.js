@@ -34,12 +34,27 @@ export class NewsController {
   }
 
   async delete(req, reply) {
-    try {
-      const { id } = req.params;
-      await service.deleteNews(id);
-      reply.status(204).send();
-    } catch {
-      reply.status(500).send({ error: "Erro ao deletar notícia" });
-    }
+  try {
+    console.log("🚨 ID recebido:", req.params.id);
+    console.log("🚨 Usuário (se houver):", req.user);
+
+    const id = req.params.id;
+
+    const result = await this.newsService.delete(id);
+
+    return reply.send({
+      success: true,
+      message: "Notícia deletada com sucesso",
+      result
+    });
+
+  } catch (err) {
+    console.error("🔥 ERRO NO DELETE:", err);
+    return reply.status(500).send({
+      success: false,
+      error: err.message || "Erro interno"
+    });
   }
+}
+
 }
