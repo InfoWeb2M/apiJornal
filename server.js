@@ -12,10 +12,7 @@ const server = fastify({ logger: true });
 
 // Middlewares nativos
 await server.register(cors, {
-  origin: [
-    "https://jornalteresa.netlify.app",
-    "https://paineljornal.vercel.app"
-  ],
+  origin: "*",
   methods: ["GET", "PUT", "POST", "DELETE", "OPTIONS"],
 });
 
