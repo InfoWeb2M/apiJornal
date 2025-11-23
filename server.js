@@ -11,9 +11,14 @@ import { errorHandler } from "./src/middlewares/errorHandler.js";
 const server = fastify({ logger: true });
 
 // Middlewares nativos
+
 await server.register(cors, {
-  origin: "*",
-  methods: ["GET", "PUT", "POST", "DELETE", "OPTIONS"],
+  origin: [
+    "https://paineljornal.vercel.app",
+    "https://jornalteresa.netlify.app"
+  ],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  credentials: true
 });
 
 server.register(cookie, {
