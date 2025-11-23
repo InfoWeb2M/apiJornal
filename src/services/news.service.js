@@ -66,7 +66,7 @@ export class NewsService {
   async deleteNews(id) {
     try {
       // Tenta buscar a notícia antes
-      const news = await model.getById(id);
+      const news = await model.list(id);
       if (!news) {
         throw new Error("Notícia não encontrada");
       }
