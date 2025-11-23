@@ -22,8 +22,8 @@ class LoginController {
       return reply
         .setCookie("token", token, {
           httpOnly: true,
-          secure: true, // obrigatório em produção (HTTPS)
-          sameSite: "strict",
+          secure: true, // HTTPS obrigatório
+          sameSite: "none", // cross-site
           path: "/",
           maxAge: 60 * 60 * 24, // 1 dia
         })
