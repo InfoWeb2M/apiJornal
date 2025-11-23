@@ -1,12 +1,14 @@
 import { NewsService } from "../services/news.service.js";
 
-const service = new NewsService();
-
 export class NewsController {
+  constructor() {
+    this.newsService = new NewsService(); // <--- inicializando
+  }
+
   async create(req, reply) {
     try {
       const parts = req.parts();
-      const data = await service.createNews(parts);
+      const data = await this.newsService.createNews(parts);
       reply.status(201).send({ message: "Notícia criada", data });
     } catch (error) {
       reply.status(500).send({ error: error.message });
@@ -16,7 +18,7 @@ export class NewsController {
   async list(req, reply) {
     try {
       const title = req.query.title || null;
-      const list = await service.listNews(title);
+      const list = await this.newsService.listNews(title);
       reply.send(list);
     } catch {
       reply.status(500).send({ error: "Erro ao listar notícias" });
@@ -26,7 +28,7 @@ export class NewsController {
   async update(req, reply) {
     try {
       const { id } = req.params;
-      await service.updateNews(id, req.body);
+      await this.newsService.updateNews(id, req.body);
       reply.status(200).send({ message: "Notícia atualizada" });
     } catch {
       reply.status(500).send({ error: "Erro ao atualizar notícia" });
@@ -34,27 +36,25 @@ export class NewsController {
   }
 
   async delete(req, reply) {
-  try {
-    console.log("🚨 ID recebido:", req.params.id);
-    console.log("🚨 Usuário (se houver):", req.user);
+    try {
+      console.log("🚨 ID recebido:", req.params.id);
+      console.log("🚨 Usuário (se houver):", req.user);
 
-    const id = req.params.id;
+      const id = req.params.id;
+      const result = await this.newsService.delete(id); // agora funciona
 
-    const result = await this.newsService.delete(id);
+      return reply.send({
+        success: true,
+        message: "Notícia deletada com sucesso",
+        result
+      });
 
-    return reply.send({
-      success: true,
-      message: "Notícia deletada com sucesso",
-      result
-    });
-
-  } catch (err) {
-    console.error("🔥 ERRO NO DELETE:", err);
-    return reply.status(500).send({
-      success: false,
-      error: err.message || "Erro interno"
-    });
+    } catch (err) {
+      console.error("🔥 ERRO NO DELETE:", err);
+      return reply.status(500).send({
+        success: false,
+        error: err.message || "Erro interno"
+      });
+    }
   }
-}
-
 }
