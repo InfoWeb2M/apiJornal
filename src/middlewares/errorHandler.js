@@ -10,13 +10,13 @@ import { AppError } from "./AppError.js";
 export function errorHandler(error, request, reply) {
   const isDev = process.env.NODE_ENV !== "production";
 
-  // 🕒 Cálculo de tempo de resposta (se registrado no request)
+  // Cálculo de tempo de resposta (se registrado no request)
   const diff = request.startTime
     ? process.hrtime(request.startTime)
     : [0, 0];
   const durationMs = (diff[0] * 1e9 + diff[1]) / 1e6;
 
-  // 🧾 Montagem do log básico
+  // Montagem do log básico
   const logData = {
     method: request.method,
     url: request.url,
