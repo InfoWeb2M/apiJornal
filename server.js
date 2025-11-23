@@ -1,4 +1,4 @@
-import "dotenv/config"
+import "dotenv/config";
 import fastify from "fastify";
 import cors from "@fastify/cors";
 import cookie from "@fastify/cookie";
@@ -15,21 +15,24 @@ const server = fastify({ logger: true });
 await server.register(cors, {
   origin: [
     "https://paineljornal.vercel.app",
-    "https://jornalteresa.netlify.app"
+    "https://jornalteresa.netlify.app",
   ],
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  credentials: true
-});
-
-
-server.register(cookie, {
-  secret: process.env.JWT_SECRET, // usado para assinaturas
+  credentials: true,
 });
 
 await server.register(multipart);
 
+server.register(cookie, {
+  secret: process.env.JWT_SECRET, // usado para assinar cookies se necessário
+});
+
 server.register(fastifyJwt, {
   secret: process.env.JWT_SECRET,
+  cookie: {
+    cookieName: "token",
+    signed: false,
+  },
 });
 
 // 🔹 Captura o início de cada request (para medir tempo de resposta)
@@ -42,7 +45,7 @@ server.setErrorHandler(errorHandler);
 
 // Rotas
 await server.register(newsRoutes);
-await server.register(loginRoutes)
+await server.register(loginRoutes);
 
 // Inicialização
 const port = process.env.PORT || 1992;

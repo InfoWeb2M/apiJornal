@@ -1,10 +1,7 @@
 export async function auth(req, reply) {
   try {
-    const token = req.cookies.token; // pega o cookie HttpOnly
-    if (!token) return reply.status(401).send({ message: 'Não autenticado' });
-
-    await req.jwtVerify(token); // verifica JWT
+    await req.jwtVerify(); // AGORA ele vai ler do cookie!
   } catch (err) {
-    reply.status(401).send({ message: 'Token inválido' });
+    reply.status(401).send({ message: "Unauthorized" });
   }
 }
