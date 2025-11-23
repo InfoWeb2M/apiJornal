@@ -1,14 +1,10 @@
 export async function auth(req, reply) {
-  const token = req.cookies.token;
-
-  if (!token) {
-    return reply.status(401).send({ Forbidden: "Token ausente" });
-  }
-
   try {
-    const decoded = await req.jwtVerify(token);
-    req.user = decoded;
+    const token = req.cookies.token; // pega o cookie HttpOnly
+    if (!token) return reply.status(401).send({ message: 'Não autenticado' });
+
+    await req.jwtVerify(token); // verifica JWT
   } catch (err) {
-    return reply.status(401).send({ Forbidden: "Token inválido" });
+    reply.status(401).send({ message: 'Token inválido' });
   }
 }
