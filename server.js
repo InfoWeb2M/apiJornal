@@ -16,6 +16,7 @@ await server.register(cors, {
   origin: [
     "https://paineljornal.vercel.app",
     "https://jornalteresa.netlify.app",
+    "http://127.0.0.1:5500/"
   ],
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   credentials: true,
