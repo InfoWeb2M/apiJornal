@@ -1,0 +1,53 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Admin_Users {
+  @@map("tb_admin_users")
+  id            String   @id @default(uuid()) @db.Uuid
+  username      String   @unique @db.VarChar(50)
+  password_hash String
+  created_at    DateTime @default(now()) @db.Timestamp(6)
+  updated_at    DateTime @default(now()) @db.Timestamp(6)
+}
+
+model noticias {
+  @@map("tb_news")
+  id         String   @id @default(uuid())
+  title      String
+  summary    String?
+  body       String
+  author     String?
+  arquivos   Arquivos[]
+  created_at DateTime @default(now()) @db.Timestamp(6)
+  newstype   String?
+  curtidas   Int      @default(0)
+}
+
+model Usuarios {
+  @@map("tb_users")
+  id         String   @id @default(uuid()) @db.Uuid 
+  firstName  String
+  lastName   String
+  email      String   @unique
+  password   String
+  role       String   @default("USER")  
+  birthDate  DateTime @db.Date
+}
+
+model Arquivos {
+  @@map("tb_files")
+  id         String   @id @default(uuid())
+  image1     String?
+  image2     String?
+  image3     String?
+  image4     String?
+  image5     String?
+  noticiaId  String
+  noticia    noticias @relation(fields: [noticiaId], references: [id], onDelete: Cascade)
+}

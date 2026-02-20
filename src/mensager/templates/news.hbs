@@ -1,0 +1,149 @@
+<html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Nova {{newstype}} - Jornal Teresa</title>
+
+        <style>
+            body {
+                margin: 0;
+                padding: 0;
+                background-color: #1f1f1a;
+            }
+
+            table {
+                border-spacing: 0;
+            }
+
+            img {
+                display: block;
+                max-width: 100%;
+                height: auto;
+            }
+
+            .container {
+                width: 600px;
+            }
+
+            @media screen and (max-width: 600px) {
+                .container {
+                    width: 100% !important;
+                }
+
+                .padding {
+                    padding: 20px !important;
+                }
+
+                .news-content {
+                    padding: 18px !important;
+                }
+
+                .news-title {
+                    font-size: 20px !important;
+                }
+
+                .footer-links a {
+                    display: block !important;
+                    margin: 8px 0 !important;
+                }
+            }
+        </style>
+    </head>
+
+    <body>
+
+        <table width="100%" bgcolor="#1f1f1a">
+            <tr>
+                <td align="center">
+
+                    <!-- Container -->
+                    <table class="container" width="600" bgcolor="#252520" style="border:1px solid #3d3d35;">
+
+                        <!-- HEADER -->
+                        <tr>
+                            <td
+                                align="center"
+                                style="padding:40px 30px; background:linear-gradient(135deg,#2a2a25 0%,#1f1f1a 100%); border-bottom:3px solid #a5c2a2;"
+                            >
+                                <img
+                                    src="https://ecejzvtwgbqddmqnbapx.supabase.co/storage/v1/object/public/imagens-noticias/Jornal_dark.webp"
+                                    width="500"
+                                    alt="Jornal Teresa"
+                                />
+                            </td>
+                        </tr>
+
+                        <!-- CONTENT -->
+                        <tr>
+                            <td class="padding" style="padding:40px 30px; font-family:Georgia, serif; color:#d8d3c2;">
+
+                                <p style="font-size:18px; margin-bottom:25px; color:#ced7c2;">
+                                    Olá,
+                                    {{name}}!
+                                </p>
+
+                                <span
+                                    style="display:inline-block; background:#a5c2a2; color:#1f1f1a; padding:6px 16px; border-radius:20px; font-size:12px; font-weight:bold; text-transform:uppercase; margin-bottom:20px;"
+                                >
+                                    Nova
+                                    {{newstype}}
+                                </span>
+
+                                <h1 class="news-title" style="font-size:24px; margin:20px 0; color:#ced7c2;">
+                                    {{title}}
+                                </h1>
+
+                                <table
+                                    width="100%"
+                                    bgcolor="#2a2a2a"
+                                    class="news-content"
+                                    style="border-left:4px solid #a5c2a2; margin:25px 0;"
+                                >
+                                    <tr>
+                                        <td style="padding:25px; font-size:15px; color:#d8d3c2;">
+                                            {{content}}
+                                        </td>
+                                    </tr>
+                                </table>
+
+                                <hr style="border:none; border-top:1px solid #3d3d35; margin:30px 0;" />
+
+                            </td>
+                        </tr>
+
+                        <!-- FOOTER -->
+                        <tr>
+                            <td align="center" style="padding:30px; background:#1f1f1a; font-family:Georgia, serif;">
+
+                                <p style="color:#b8ac92; font-size:14px; margin-bottom:8px;">
+                                    Atenciosamente,
+                                </p>
+
+                                <p style="color:#ced7c2; font-weight:bold; font-size:16px; margin-bottom:20px;">
+                                    Equipe Teresa
+                                </p>
+
+                                <p>
+                                    <a
+                                        href="https://jornalteresa.netlify.app"
+                                        style="color:#a5c2a2; text-decoration:none; font-size:13px;"
+                                    >
+                                        Visite nosso site
+                                    </a>
+                                </p>
+
+                                <p style="color:#b8ac92; font-size:12px; margin-top:15px;">
+                                    © 2026 Jornal Teresa. Todos os direitos reservados.
+                                </p>
+
+                            </td>
+                        </tr>
+
+                    </table>
+
+                </td>
+            </tr>
+        </table>
+
+    </body>
+</html>
