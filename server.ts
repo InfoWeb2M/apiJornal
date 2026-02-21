@@ -16,7 +16,7 @@ dotenv.config();
 
 server.use(
   cors({
-    origin: ["http://localhost:3000", "http://localhost:3001", "http://localhost:3002"],
+    origin: ["http://localhost:3000", "http://localhost:3001", "http://localhost:3002", "https://jornalteresa.vercel.app"],
     credentials: true,
     methods: ["GET", "DELETE", "POST", "OPTIONS", "PUT", "PATCH"],
   })
