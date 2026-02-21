@@ -25,10 +25,11 @@ export default class UserController {
       const result = await UserService.loginUser(email, password);
 
       res.cookie("auth_token", result.token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      });
+  httpOnly: true,
+  secure: true,
+  sameSite: "none",
+  path: "/"
+});
 
       return res.status(200).json({ ok: "Login realizado com sucesso" });
     } catch (error) {
